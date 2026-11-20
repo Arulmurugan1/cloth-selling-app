@@ -8,6 +8,8 @@ spring:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/clothapp}
     username: ${DB_USER:clothapp}
     password: ${DB_PASSWORD}
+    hikari:
+      schema: orders
   jpa:
     open-in-view: false
     hibernate:

@@ -1,6 +1,6 @@
 package com.clothapp.inventory.batch;
 
-import org.springframework.batch.core.Job;
+import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;

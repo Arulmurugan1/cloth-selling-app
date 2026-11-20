@@ -2,20 +2,20 @@ package com.clothapp.inventory.batch;
 
 import com.clothapp.inventory.product.Product;
 import com.clothapp.inventory.product.ProductRepository;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.Step;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
+import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.item.file.FlatFileItemReader;
-import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
-import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
-import org.springframework.batch.item.file.mapping.DefaultLineMapper;
-import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
+import org.springframework.batch.infrastructure.item.file.FlatFileItemReader;
+import org.springframework.batch.infrastructure.item.file.builder.FlatFileItemReaderBuilder;
+import org.springframework.batch.infrastructure.item.file.mapping.BeanWrapperFieldSetMapper;
+import org.springframework.batch.infrastructure.item.file.mapping.DefaultLineMapper;
+import org.springframework.batch.infrastructure.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -87,12 +87,6 @@ public class ProductCsvBatchConfig {
     @org.springframework.batch.core.configuration.annotation.StepScope
     public FlatFileItemReader<CsvProductRow> productReader(
             @org.springframework.beans.factory.annotation.Value("#{jobParameters['csvPath']}") String csvPath) {
-        FlatFileItemReader<CsvProductRow> reader = new FlatFileItemReaderBuilder<CsvProductRow>()
-                .name("productCsvReader")
-                .resource(new FileSystemResource(csvPath == null ? "" : csvPath))
-                .linesToSkip(1)
-                .build();
-
         DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer();
         tokenizer.setNames("sku", "name", "description", "category", "size", "color", "price", "imageUrl",
                 "stockQty", "defectiveQty");
@@ -104,8 +98,13 @@ public class ProductCsvBatchConfig {
         DefaultLineMapper<CsvProductRow> lineMapper = new DefaultLineMapper<>();
         lineMapper.setLineTokenizer(tokenizer);
         lineMapper.setFieldSetMapper(mapper);
-        reader.setLineMapper(lineMapper);
-        return reader;
+
+        return new FlatFileItemReaderBuilder<CsvProductRow>()
+                .name("productCsvReader")
+                .resource(new FileSystemResource(csvPath == null ? "" : csvPath))
+                .linesToSkip(1)
+                .lineMapper(lineMapper)
+                .build();
     }
 
     public BatchImportResult runImport(JobLauncher launcher, Job job, File file) throws Exception {
