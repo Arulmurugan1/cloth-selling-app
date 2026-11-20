@@ -1,0 +1,53 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/clothapp}
+    username: ${DB_USER:clothapp}
+    password: ${DB_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    health:
+      show-details: always
+  tracing:
+    sampling:
+      probability: 1.0
+
+app:
+  internal-api-key: ${INTERNAL_API_KEY}
+  jwt:
+    secret: ${JWT_SECRET}
+    expiry-seconds: 3600
+  concurrent-login-limit: 2
+  login:
+    max-failed-attempts: 5
+  rate-limit:
+    max-requests-per-minute: 120
+  inventory-base-url: ${INVENTORY_BASE_URL:http://localhost:8082}
+  order-base-url: ${ORDER_BASE_URL:http://localhost:8081}
+
+logging:
+  file:
+    name: logs/api-gateway.log
