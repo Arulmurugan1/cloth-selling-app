@@ -35,7 +35,7 @@ cp .env.example .env
 | `DB_PASSWORD` | PostgreSQL password |
 | `INTERNAL_API_KEY` | Shared key for service-to-service calls |
 | `JWT_SECRET` | HMAC key used to sign JWTs |
-| `SUPERADMIN_PASSWORD` | Password for the bootstrap super admin account |
+| `SUPERADMIN_PASSWORD` | Password for the bootstrap super admin account (must be 4–12 characters, the login validation limit) |
 
 `.env` is gitignored. Docker Compose fails fast if any of these are missing.
 
@@ -48,7 +48,7 @@ docker compose up --build
 Once running:
 
 - Frontend: http://localhost:5173
-- API gateway: http://localhost:8080
+- API gateway: http://localhost:8090 (container port 8080; host 8080 is often taken on Windows)
 - Grafana: http://localhost:3000
 - Prometheus: http://localhost:9090
 - Jaeger: http://localhost:16686
